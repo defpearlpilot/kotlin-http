@@ -3,13 +3,12 @@ package dpp.server.groups
 import dpp.graph.authentication.acquireToken
 import dpp.graph.authentication.promiseToken
 import dpp.graph.groups.MSGroup
+import dpp.graph.groups.promiseGroupUsers
+import dpp.graph.groups.promiseGroups
 import dpp.graph.users.MSUser
-import dpp.graph.users.promiseGroupUsers
-import dpp.graph.users.promiseGroups
 import dpp.identity.test.TestIdentity
 import nl.komponents.kovenant.Promise
 import nl.komponents.kovenant.functional.bind
-import nl.komponents.kovenant.then
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
