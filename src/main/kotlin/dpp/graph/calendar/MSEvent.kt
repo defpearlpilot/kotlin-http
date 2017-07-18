@@ -1,8 +1,12 @@
-package dpp.graph.groups
+package dpp.graph.calendar
 
 import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.google.gson.Gson
+import com.google.gson.*
+import com.google.gson.annotations.JsonAdapter
+import java.lang.reflect.Type
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 
 /*
@@ -50,24 +54,78 @@ import java.time.LocalDateTime
 "organizer":{"emailAddress":{"name":"Bruce Springsteen","address":"bruce@designitcontoso.onmicrosoft.com"}}}
  */
 
+object LocalDateTimeCodec : JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
+  override fun serialize(src: LocalDateTime?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement
+  {
+    val formatted = src?.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) ?: "null"
+    println("Serialized $formatted")
+    return JsonPrimitive(formatted)
+  }
+
+  override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): LocalDateTime?
+  {
+    println("Deserialized $json")
+    return when(json) {
+      null -> null
+      else -> {
+
+        val src = LocalDateTime.parse(json.asJsonPrimitive.asString)
+        val formatted = src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) ?: "null"
+        println("Reified $formatted")
+        src
+      }
+    }
+  }
+}
+
+
+object ZonedDateTimeCodec : JsonSerializer<ZonedDateTime>, JsonDeserializer<ZonedDateTime> {
+  override fun serialize(src: ZonedDateTime?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement
+  {
+    val formatted = src?.format(DateTimeFormatter.ofPattern("YYYY-MM-DD")) ?: "null"
+    println("Serialized $formatted")
+    return JsonPrimitive(formatted)
+  }
+
+  override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): ZonedDateTime?
+  {
+    println("Deserialized $json")
+    return when(json) {
+      null -> null
+      else -> ZonedDateTime.parse(json.asJsonPrimitive.asString)
+    }
+  }
+}
+
+
+var gson = GsonBuilder()
+    .registerTypeAdapter(ZonedDateTime::class.java, ZonedDateTimeCodec)
+    .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeCodec)
+    .create()
+
+
 data class MSEmail(val name: String, val address: String)
 
 data class MSAttendee(val emailAddress: MSEmail)
 
-data class MSZonedDateTime(val dateTime: LocalDateTime, val timeZone: String)
+data class MSZonedDateTime(@JsonAdapter(LocalDateTimeCodec::class) val dateTime: LocalDateTime,
+                           val timeZone: String)
 
 data class MSEvent(val id: String,
                    val subject: String,
                    val bodyPreview: String,
                    val displayName: String,
-                   val organizer: MSAttendee
+                   @JsonAdapter(ZonedDateTimeCodec::class) val createdDateTime: ZonedDateTime,
+                   val organizer: MSAttendee,
+                   val attendees: List<MSAttendee>,
+                   val start: MSZonedDateTime,
+                   val end: MSZonedDateTime
                   )
 {
   class Deserializer : ResponseDeserializable<MSEvent>
   {
-    override fun deserialize(content: String) = Gson().fromJson(content, MSEvent::class.java)
+    override fun deserialize(content: String) = gson.fromJson(content, MSEvent::class.java)
   }
-
 }
 
 
@@ -75,7 +133,8 @@ class MSEventResponse(val value: List<MSEvent>)
 {
   class Deserializer : ResponseDeserializable<MSEventResponse>
   {
-    override fun deserialize(content: String) = Gson().fromJson(content, MSEventResponse::class.java)
+    override fun deserialize(content: String) = gson.fromJson(content, MSEventResponse::class.java)
   }
-
 }
+
+

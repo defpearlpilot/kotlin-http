@@ -9,16 +9,19 @@ import nl.komponents.kovenant.deferred
 import nl.komponents.kovenant.functional.map
 
 
-fun identityToParameters(identity: Identity): List<Pair<String, String>>
+fun promiseToken(identity: Identity): Promise<String, Exception>
 {
-  val clientId = Pair("client_id", identity.clientId())
-  val clientSecret = Pair("client_secret", identity.secret())
-
-  return listOf(clientId, clientSecret)
+  return postToken(identity).map { token -> token.access_token }
 }
 
 
-fun postToken(identity: Identity) : Promise<MSTokenResponse, Exception>
+fun acquireToken(identity: Identity): String
+{
+  return promiseToken(identity).get()
+}
+
+
+private fun postToken(identity: Identity) : Promise<MSTokenResponse, Exception>
 {
   val idParams = identityToParameters(identity)
   val parameters = idParams.plus(Pair("grant_type", "client_credentials")).plus(Pair("resource", "https://graph.microsoft.com"))
@@ -38,15 +41,12 @@ fun postToken(identity: Identity) : Promise<MSTokenResponse, Exception>
 }
 
 
-fun promiseToken(identity: Identity): Promise<String, Exception>
+private fun identityToParameters(identity: Identity): List<Pair<String, String>>
 {
-  return postToken(identity).map { token -> token.access_token }
-}
+  val clientId = Pair("client_id", identity.clientId())
+  val clientSecret = Pair("client_secret", identity.secret())
 
-
-fun acquireToken(identity: Identity): String
-{
-  return promiseToken(identity).get()
+  return listOf(clientId, clientSecret)
 }
 
 

@@ -27,18 +27,18 @@ class GroupsController
   @RequestMapping("/groups/{groupName}")
   fun getUsers(@PathVariable("groupName") groupName: String): List<MSUser>
   {
-    val identity = TestIdentity()
-    val token = acquireToken(identity)
+    fun getUsers (token: String, groups: List<MSGroup>): Promise<List<MSUser>, Exception> {
+      val group = groups.find { g -> g.displayName == groupName }
+      return when (group)
+      {
+        null -> Promise.ofFail(Exception("Unable to find group"))
+        else -> promiseGroupUsers(token, group.id)
+      }
+    }
 
-    return promiseGroups(token)
-        .bind { groups ->
-          val group = groups.find { g -> g.displayName == groupName }
-          when (group)
-          {
-            null -> Promise.ofFail(Exception("Unable to find group"))
-            else -> promiseGroupUsers(token, group.id)
-          }
-        }.get()
+    /* start */
+    val token = acquireToken(TestIdentity())
+    return promiseGroups(token).bind { getUsers(token, it) }.get()
   }
 
 }
