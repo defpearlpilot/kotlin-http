@@ -1,4 +1,4 @@
-package dpp.graph.authentication
+package dpp.graph.ms.authentication
 
 
 import com.github.kittinunf.fuel.httpPost

@@ -1,4 +1,4 @@
-package dpp.graph.groups
+package dpp.graph.ms.groups
 
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.google.gson.Gson
@@ -34,9 +34,14 @@ data class MSGroup(val id: String,
 
 class MSGroupResponse(val value: List<MSGroup>)
 {
+  val groups: List<MSGroup>
+    get() = value
+
   class Deserializer : ResponseDeserializable<MSGroupResponse>
   {
     override fun deserialize(content: String) = Gson().fromJson(content, MSGroupResponse::class.java)
   }
-
 }
+
+
+val NullMSGroupResponse = MSGroupResponse(listOf())

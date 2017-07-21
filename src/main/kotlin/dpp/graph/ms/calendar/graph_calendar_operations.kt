@@ -1,4 +1,4 @@
-package dpp.graph.calendar
+package dpp.graph.ms.calendar
 
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
