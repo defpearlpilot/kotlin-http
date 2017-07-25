@@ -23,7 +23,7 @@ internal fun MSUser.toMicrosoftUser(graph: MicrosoftGraph) = MicrosoftUser(graph
 
 internal class MicrosoftUsers(private val graph: MicrosoftGraph, private val users: List<MicrosoftUser>?) : Users
 {
-  suspend override fun all(): List<User>
+  suspend override fun all(): List<MicrosoftUser>
   {
     return when(users)
     {
@@ -33,16 +33,6 @@ internal class MicrosoftUsers(private val graph: MicrosoftGraph, private val use
       }
       else -> users
     }
-  }
-
-  override suspend fun named(name: String): User?
-  {
-    return all().find { it.name == name }
-  }
-
-  override suspend fun identified(id: String): User?
-  {
-    return all().find { it.id == id }
   }
 }
 

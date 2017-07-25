@@ -1,7 +1,6 @@
-package dpp.graph.ms.users
+package dpp.graph.test.users
 
 import dpp.graph.*
-import dpp.graph.ms.MicrosoftGraph
 
 
 internal class TestUser(override val id: String, override val name: String) : User
@@ -12,22 +11,11 @@ internal class TestUser(override val id: String, override val name: String) : Us
   }
 }
 
-internal class TestUsers : Users
+internal class TestUsers(private val users: List<User>) : Users
 {
-  suspend override fun all(): List<TestUser>
+  suspend override fun all(): List<User>
   {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    return users
   }
-
-  override suspend fun named(name: String): TestUser?
-  {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  override suspend fun identified(id: String): TestUser?
-  {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
 }
 

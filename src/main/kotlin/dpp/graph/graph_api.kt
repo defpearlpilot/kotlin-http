@@ -1,5 +1,6 @@
 package dpp.graph
 
+import dpp.graph.test.groups.TestGroup
 import java.time.LocalDateTime
 
 interface Location
@@ -12,7 +13,14 @@ interface Collection<out T>
 }
 
 
-interface UniquelyIdentifiable<out T>
+interface Identifiable
+{
+  val name: String
+  val id: String
+}
+
+
+interface UniquelyIdentifiable<out T:Identifiable>
 {
   suspend fun named(name: String): T?
   suspend fun identified(id: String) : T?
@@ -27,6 +35,15 @@ interface Searchable<T>
 }
 
 
+interface IdentifiableCollection<out T:Identifiable>: Collection<T>, UniquelyIdentifiable<T>
+{
+  // all "mixed-in" from actual implementing class
+  private suspend fun find(predicate: (item: T) -> Boolean): T? = all().find { predicate(it) }
+
+  override suspend fun named(name: String): T? = find { it.name == name }
+  override suspend fun identified(id: String): T? = find { it.id == id }
+}
+
 interface Meeting
 {
   val owner: String
@@ -37,28 +54,24 @@ interface Meetings: Searchable<Meeting>
 
 }
 
-interface User
-{
-  val id: String
-  val name: String
-}
-
-
-interface Users: UniquelyIdentifiable<User>, Collection<User>
+interface User: Identifiable
 {
 }
 
 
-interface Group
+interface Users: IdentifiableCollection<User>
 {
-  val id: String
-  val name: String
+}
+
+
+interface Group: Identifiable
+{
 
   suspend fun users(): Users
 }
 
 
-interface Groups: UniquelyIdentifiable<Group>, Collection<Group>
+interface Groups: IdentifiableCollection<Group>
 {
 }
 
@@ -66,6 +79,5 @@ interface Groups: UniquelyIdentifiable<Group>, Collection<Group>
 interface Graph
 {
   suspend fun groups(): Groups
-
   suspend fun users(): Users
 }

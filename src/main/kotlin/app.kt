@@ -10,7 +10,19 @@ class App
     fun main(args: Array<String>) = runBlocking<Unit>
     {
       val API = GraphAPIFactory.API(TestIdentity())
-      API.groups().named("nyc-rooms")?.users()?.all()?.forEach { println(it) }
+//      val API = GraphAPIFactory.testAPI()
+
+      val nycUsers = API.groups().named("nyc-rooms")?.users()
+      println("NYC users ${nycUsers?.all()}")
+
+      val blueRoom = nycUsers?.named("Blue")
+      println("Blue room $blueRoom")
+
+//      API.groups()
+//          .named("nyc-rooms")
+//          ?.users()
+//          ?.all()
+//          ?.forEach { println(it) }
     }
   }
 }
