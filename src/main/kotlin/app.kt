@@ -9,8 +9,8 @@ class App
     @JvmStatic
     fun main(args: Array<String>) = runBlocking<Unit>
     {
-      val API = GraphAPIFactory.API(TestIdentity())
-//      val API = GraphAPIFactory.testAPI()
+//      val API = GraphAPIFactory.API(TestIdentity())
+      val API = GraphAPIFactory.testAPI()
 
       val nycUsers = API.groups().named("nyc-rooms")?.users()
       println("NYC users ${nycUsers?.all()}")

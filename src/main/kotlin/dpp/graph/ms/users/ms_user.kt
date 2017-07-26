@@ -8,13 +8,12 @@ internal class MicrosoftUser(private val graph: MicrosoftGraph, private val user
 {
   override val id: String
     get() = user.id
+
   override val name: String
     get() = user.displayName
 
-  override fun toString(): String
-  {
-    return "User($id)[$name]"
-  }
+
+  override fun toString(): String = "User($id)[$name]"
 }
 
 

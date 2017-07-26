@@ -14,18 +14,14 @@ class TestGroup(override val id: String, override val name: String, private val 
     return "Group($id)[$name]"
   }
 
-  suspend override fun users(): Users
-  {
-    return users
-  }
+  suspend override fun users(): Users = users
 }
 
 
 internal class TestGroups : Groups
 {
-  override suspend fun all(): List<TestGroup>
-  {
-    return listOf(TestGroup("1", "nyc-rooms", TestUsers(listOf(TestUser("1", "Blue")))))
-  }
+  private val nycRooms = TestGroup("1", "nyc-rooms", TestUsers(listOf(TestUser("1", "Blue"))))
+
+  override suspend fun all(): List<TestGroup> = listOf(nycRooms)
 }
 
